@@ -95,12 +95,6 @@ namespace CSVConverterConsole
                             delim = "\t";
                             Console.WriteLine("Using tab as separator..");
                         }
-                        else if (args[3] == "spaces")
-                        {
-                            delim = "  ";
-                            Console.WriteLine("Using spaces(default) separator..");
-                        }
-
                         else
                         {
                             delim = args[3];
@@ -110,28 +104,14 @@ namespace CSVConverterConsole
                     else
                         Console.WriteLine("Using spaces as separator..");
 
-                    int threshold = 0;
-                    if (args.Length > 4)
-                    {
-                        if (!int.TryParse(args[4], out threshold))
-                        {
-                            Console.WriteLine("Invalid threshold specification.");
-
-                        }
-                        else
-                        {
-                            Console.WriteLine(String.Format("Threshold value {0} set. Be advised this number should be less than or equal to 1.", args[4]));
-                        }
-                    }
-
-                    ProcessFile(path, output, headerLines, dataFormatInt, primaryKey, new string[] { delim }, threshold);
+                    ProcessFile(path, output, headerLines, dataFormatInt, primaryKey, new string[] { delim });
                 }
             }
 
             Console.WriteLine(String.Format("Successfully converted files to .csv at {0}", output));
         }
 
-        public static void ProcessFile(string input, string output, int numHeaderLines, int dataFormat, int primaryKey, string[] delim, int threshold)
+        public static void ProcessFile(string input, string output, int numHeaderLines, int dataFormat, int primaryKey, string[] delim)
         {
             Console.WriteLine(String.Format("Processing {0}..", input));
             //read line
@@ -144,11 +124,12 @@ namespace CSVConverterConsole
                 string newLine = ""; //output line
                 string headerLine = ""; //output headerline
                 bool completed = false;
-                int lineIndex = 0;
+                long lineIndex = 0;
                 long writtenBytes = 0;
                 string line;
 
                 ArrayList headerList = new ArrayList();
+                ArrayList greatestHeaderWordList = new ArrayList();
 
                 while (!completed)
                 {
@@ -204,21 +185,22 @@ namespace CSVConverterConsole
 
                                             //int addCount2 = totalNullCount % 2 == 1 ? totalNullCount / 2 + 1 : totalNullCount / 2;
                                             //int addCount1 = totalNullCount / 2;
-                                            int addCount2 = 0 + threshold; //behind the word
-                                            int addCount1 = totalNullCount - threshold; //spaces
+                                            //int addCount2 = 0;
+                                            //int addCount1 = totalNullCount;
 
                                             if (arrayIndex - 1 >= 0)
                                             {
-                                                lineCountList[arrayIndex - 1] = (int)lineCountList[arrayIndex - 1] + addCount1;
-                                                lineCountList.Add(totalCharCount + addCount2);
+                                                lineCountList[arrayIndex - 1] = (int)lineCountList[arrayIndex - 1] + totalNullCount;
+                                                lineCountList.Add(totalCharCount);// + addCount2);
                                             }
                                             else
                                                 lineCountList.Add(totalCharCount + totalNullCount);
 
-                                            totalNullCount = 0;
+
 
                                             //Always a "delimiter" missing from calculations when splitting.\. in between split thing.
-                                            totalNullCount += 2;
+                                            //totalNullCount += 2;
+                                            totalNullCount = 2;
                                             totalCharCount += 2;
 
                                             arrayIndex++;
@@ -261,8 +243,29 @@ namespace CSVConverterConsole
                                                 i = lineCountList.Count - 1;
                                             }
 
+
+                                            //Adjusting alignment
+                                            //Check if left aligned
+
+                                            if (i > 0)
+                                            {
+                                                string str = s.Trim();
+                                                int compare2 = totalCharCount - s.Length;
+                                                int compare1 = (int)lineCountList[i - 1];
+                                                if ((compare1 - compare2) > 1)
+                                                {
+                                                    int difference = (str.Length - ((string)greatestHeaderWordList[i]).Length) + 1;
+                                                    if (difference > 1)
+                                                    {
+                                                        lineCountList[i - 1] = (int)lineCountList[i - 1] - (difference) / 2;
+                                                        //lineCountList[i] = (int)lineCountList[i] + difference/2; Because there's plenty                of space already.
+                                                        greatestHeaderWordList[i] = str;
+                                                    }
+                                                }
+                                            }
+
                                             headerList[i] = string.Format("{0} {1}",
-                                            (string)headerList[i], s.Trim().Replace(',', ' ').Replace('"', ' '));
+                                                (string)headerList[i], s.Trim().Replace(',', ' ').Replace('"', ' '));
 
                                             totalCharCount += 2;
                                         }
@@ -314,7 +317,7 @@ namespace CSVConverterConsole
 
                                     if (dataList.Count != headerList.Count)
                                     {
-                                        Console.WriteLine("ERROR: Parsed data columns not equal to header columns. Modifications to data made. ");
+                                        Console.WriteLine(String.Format("ERROR: Line {0} Misaligned Column. See \\helpfiles to manually fix. Continuing.. ", lineIndex));
 
                                         while (dataList.Count < headerList.Count)
                                         {
@@ -370,11 +373,20 @@ namespace CSVConverterConsole
                                 #endregion
 
                                 #region postprocess
-                                if (lineIndex < numHeaderLines)
+                                if (lineIndex < numHeaderLines - 1)
                                 {
+                                    if (lineIndex == 0)
+                                    {
+                                        //Perform Deep copy
+                                        foreach (string e in headerList)
+                                        {
+                                            greatestHeaderWordList.Add(e);
+                                        }
+                                    }
+
                                     lineIndex++;
                                 }
-                                else if (lineIndex == numHeaderLines)
+                                else if (lineIndex == numHeaderLines - 1)
                                 {
                                     //For SAS format, must eliminate duplicates in header as well as
                                     // truncate to 32 character.
@@ -425,7 +437,7 @@ namespace CSVConverterConsole
 
                                     lineIndex++;
                                 }
-                                else if (lineIndex > numHeaderLines)
+                                else if (lineIndex > numHeaderLines - 1)
                                 {
                                     //write comma seperated line.
                                     if (dataFormat == 1 ||
@@ -458,6 +470,7 @@ namespace CSVConverterConsole
                                     }
 
                                     dataList = new ArrayList();
+                                    lineIndex++;
                                 }
                                 #endregion
 
