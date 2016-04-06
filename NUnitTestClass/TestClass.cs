@@ -42,18 +42,34 @@ namespace TestClass
             csvFile = new CSVFileMetadata(output, numHeaderLines, dataFormat, primaryKey, delim);
             convertor = new Convertor(textFile, csvFile);
             modelData = new ModelData();
-        
+            
+            
+            convertor.Run();
         }
         [Test]
         public void greatestHeaderWordList()
-        {
-            convertor.Run();
-
-            Assert.IsNotEmpty(convertor.headerList);
+        {    
             Assert.IsNotEmpty(convertor.greatestHeaderWordList);
-            Assert.AreSame(convertor.headerList, modelData.headerList);
-            Assert.AreSame(convertor.headerList, modelData.greatestHeaderWordList);
+            CollectionAssert.AreEqual(convertor.greatestHeaderWordList, modelData.greatestHeaderWordList);
+        }
 
+        [Test]
+        public void headerList()
+        {
+            Assert.IsNotEmpty(convertor.headerList);
+            CollectionAssert.AreEqual(convertor.headerList, modelData.headerList);
+        }
+
+        [Test]
+        public void fileHeader()
+        {
+            //String Asserts
+        }
+
+        [Test]
+        public void fileData()
+        {
+            //String Asserts
         }
 
         [TestFixtureTearDown]
