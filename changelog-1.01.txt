@@ -1,0 +1,2 @@
+1.01
+	- Changed default behavior of rows with errors to delete/skip rows with detected error. 

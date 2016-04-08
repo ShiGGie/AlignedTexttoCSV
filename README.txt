@@ -28,7 +28,8 @@ This software requires you to specify the
 2) whether each row of data is made of multiple lines or one. 
 2.5) The primary key column
 3) Path to the file 
-4) Optional: the delimiter of the text file. (Default: "spaces")
+4) Optional: the delimiter of the text file. (Default: "spaces"
+5) Optional: "no" in order to keep columns that have errors.
 	
 ### Using multi-lines on GUI and console
 	Console:
