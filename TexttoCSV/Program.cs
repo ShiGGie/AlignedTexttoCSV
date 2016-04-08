@@ -70,7 +70,6 @@ namespace CSVConverterConsole
                 if (!int.TryParse(args[0], out headerLines))
                 {
                     Console.WriteLine("Invalid Number of header lines, Argument 1.");
-                    Console.ReadLine();
                     System.Environment.Exit(1);
                 };
 
@@ -98,13 +97,11 @@ namespace CSVConverterConsole
                         {
                             Console.WriteLine(String.Format("Invalid Command: {0}", dataFormat));
                             Console.WriteLine("Invalid Multi-line data format specified. The format is: multi,#");
-                            Console.ReadLine();
                             System.Environment.Exit(1);
                         }
                         if (!int.TryParse(dataFormatSplit[1], out primaryKey))
                         {
                             Console.WriteLine("Please insert a valid primary key column number(>1)");
-                            Console.ReadLine();
                             System.Environment.Exit(1);
                         }
 
@@ -114,7 +111,6 @@ namespace CSVConverterConsole
                     {
                         Console.WriteLine(String.Format("Invalid Command: {0}", dataFormat));
                         Console.WriteLine("Invalid Multi-line data format specified. The format is: multi,#");
-                        Console.ReadLine();
                         System.Environment.Exit(1);
                     }
                 }

@@ -45,12 +45,6 @@ namespace ConvertorClass
                     List<String> dataList = new List<String>();
                     List<int> lineCountList = new List<int>();
 
-
-                    if (headerLine != "")
-                        writetext.WriteLine(headerLine);
-                    if (newLine != "")
-                        writetext.WriteLine(newLine);
-
                     while ((line = readtext.ReadLine()) != null)
                     {
                         #region process each line
@@ -349,17 +343,14 @@ namespace ConvertorClass
         {
             //For SAS format, must eliminate duplicates in header as well as
             // truncate to 32 character.
-            //int truncate = 0;
+
             var map = new Dictionary<string, int>();
             for (int s = 0; s < headerList.Count; s++)
             {
 
                 string str = (string)headerList[s];
                 string substring;
-                //int tSize = truncate / 10;
-                //string substring1 = str.Substring(0, 21);
-                //string substring2 = str.Substring(str.Length - (10), (10));
-                //headerList[s] = String.Format("{0}_{1}", substring1, substring2);
+
                 if (str.Length > 29)
                     substring = str.Substring(0, 30);
                 else
