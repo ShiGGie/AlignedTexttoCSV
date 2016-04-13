@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlignedWordsToTableProcessor.cs" />
     <Compile Include="Convertor.cs" />
     <Compile Include="Containers\CSVFileMetadata.cs" />
     <Compile Include="Containers\IFileContainer.cs" />

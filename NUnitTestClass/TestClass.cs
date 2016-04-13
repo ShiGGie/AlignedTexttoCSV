@@ -49,15 +49,15 @@ namespace TestClass
         [Test]
         public void greatestHeaderWordList()
         {
-            Assert.IsNotEmpty(convertor.greatestHeaderWordList);
-            CollectionAssert.AreEqual(convertor.greatestHeaderWordList, modelData.greatestHeaderWordList);
+            Assert.IsNotEmpty(convertor.AWTTP.greatestHeaderWordList);
+            CollectionAssert.AreEqual(convertor.AWTTP.greatestHeaderWordList, modelData.greatestHeaderWordList);
         }
 
         [Test]
         public void headerList()
         {
-            Assert.IsNotEmpty(convertor.headerList);
-            CollectionAssert.AreEqual(convertor.headerList, modelData.headerList);
+            Assert.IsNotEmpty(convertor.AWTTP.headerList);
+            CollectionAssert.AreEqual(convertor.AWTTP.headerList, modelData.headerList);
         }
 
         [Test]
