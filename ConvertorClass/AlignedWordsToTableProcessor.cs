@@ -81,26 +81,7 @@ namespace ConvertorClass
                 greatestHeaderWordList.Add(e);
             }
 
-            using (StreamWriter sw = new StreamWriter("test1.txt"))
-            {
-                string str = "";
-                foreach (string e in headerList)
-                {
-                    str += String.Format("\"{0}\",", e);
-                }
-                sw.WriteLine("[" + str.Remove(str.Length-1) + "]");
-            }
-
-            using (StreamWriter sw = new StreamWriter("test2.txt"))
-            {
-                string str = "";
-                foreach (string e in greatestHeaderWordList)
-                {
-                   str += String.Format("\"{0}\",",e);
-                   
-                }
-                sw.WriteLine("[" + str.Remove(str.Length - 1) + "]");
-            }
+           
         }
 
         /// <summary>
@@ -167,25 +148,7 @@ namespace ConvertorClass
                 }
             }
 
-            using (StreamWriter sw = new StreamWriter("2test1.txt"))
-            {
-                string str = "";
-                foreach (string e in headerList)
-                {
-                    str += String.Format("\"{0}\",", e);
-                }
-                sw.WriteLine("[" + str.Remove(str.Length - 1) + "]");
-            }
-
-            using (StreamWriter sw = new StreamWriter("2test2.txt"))
-            {
-                string str = "";
-                foreach (string e in greatestHeaderWordList)
-                {
-                    str += String.Format("\"{0}\",", e);
-                }
-                sw.WriteLine("[" + str.Remove(str.Length - 1) + "]");
-            }
+        
         }
 
         /// <summary>
@@ -332,15 +295,7 @@ namespace ConvertorClass
                 }
             }
 
-            using (StreamWriter sw = new StreamWriter("5test1.txt"))
-            {
-                string str = "";
-                foreach (string e in headerList)
-                {
-                    str += String.Format("\"{0}\",", e);
-                }
-                sw.WriteLine("[" + str.Remove(str.Length - 1) + "]");
-            }
+
         }
 
         /// <summary>
