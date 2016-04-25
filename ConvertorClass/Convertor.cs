@@ -42,28 +42,36 @@ namespace ConvertorClass
 
                 using (StreamWriter writetext = new StreamWriter(newName))
                 {
+                    string newLine = "";
+
                     while ((line = readtext.ReadLine()) != null)
                     {
                         if (line.Trim() != "")
                         {
                             string[] lineSplit = line.Split(csvFile.delim, StringSplitOptions.None);
+
                             if (lineIndex == 0)
                                 AWTTP.ProcessFirstHeaderLine(lineSplit);
                             else if (lineIndex < csvFile.numHeaderLines)
                                 AWTTP.ProcessHeaderLines(lineSplit); 
-                            else if (AWTTP.dataList.Count == 0) //Some coupling here
-                                AWTTP.ProcessFirstDataLine(lineSplit, lineIndex);
                             else
-                                AWTTP.ProcessOtherDataLines(lineSplit);
+                                newLine = AWTTP.ProcessDataLine(lineSplit, lineIndex, csvFile.primaryKey, csvFile.dataFormat);
 
                             if (lineIndex == csvFile.numHeaderLines - 1)
                                 WriteHeaderLine(AWTTP, writetext);
-                            else if (lineIndex > csvFile.numHeaderLines - 1)
-                                WriteDataLine(AWTTP, writetext);
+
+                            if (newLine != "")
+                                writeDataLine(newLine, AWTTP, writetext);
 
                             lineIndex++;
-                        }//End if not null line 
+                        }//End if not 
                     } //End while reading the line.
+
+                    if (AWTTP.dataList.Count > 0)
+                    {
+                        newLine = AWTTP.createDataLine();
+                        writeDataLine(newLine, AWTTP, writetext);
+                    }
                 }//writer
                 Console.WriteLine(String.Format("OK"));
             }//reader
@@ -87,19 +95,9 @@ namespace ConvertorClass
             }
         }
 
-        private void WriteDataLine(AlignedWordsToTableProcessor AWTTP, StreamWriter writetext)
+        private void writeDataLine(string newLine, AlignedWordsToTableProcessor AWTTP, StreamWriter writetext)
         {
-            //Make sure ONELINE is set or that MULTILINE primary key record is not NULL
-            //dataList[csvFile.primaryKey] == NULL : Not a new row of data, instead it follows from the previous.
-            //dataList[csvFile.primaryKey] != NULL : A new row of data
-            if (csvFile.dataFormat == ONELINE ||
-                (csvFile.dataFormat == MULTILINE && AWTTP.dataList[csvFile.primaryKey] != ""))
-            {
-                AWTTP.PadDataList();
-                string newLine = string.Join(",", AWTTP.dataList.ToArray());
-                writetext.WriteLine(newLine);
-            }
-            AWTTP.ClearDataList();
+            writetext.WriteLine(newLine);
         }
 
         /// <summary>
@@ -110,5 +108,6 @@ namespace ConvertorClass
         {
             return Regex.Replace(Path.GetFileNameWithoutExtension(name), @"\W|_", "_");
         }
+
     }
 }

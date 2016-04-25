@@ -9,10 +9,14 @@ namespace ConvertorClass
 {
     public class AlignedWordsToTableProcessor
     {
+        private const int ONELINE = 1;
+        private const int MULTILINE = 0;
+
         private readonly bool skip;
         public List<String> headerList { get; private set; }
         public List<String> greatestHeaderWordList { get; private set; }
         public List<String> dataList { get; private set; }
+        public List<String> tempDataList { get; private set; }
         public List<int> lineCountList { get; private set; }
 
         /// <summary>
@@ -24,6 +28,7 @@ namespace ConvertorClass
             this.headerList = new List<String>();
             this.greatestHeaderWordList = new List<String>();
             this.dataList = new List<String>();
+            this.tempDataList = new List<String>();
             this.lineCountList = new List<int>();
             this.skip = skipErrors;
         }
@@ -74,6 +79,27 @@ namespace ConvertorClass
             foreach (string e in headerList)
             {
                 greatestHeaderWordList.Add(e);
+            }
+
+            using (StreamWriter sw = new StreamWriter("test1.txt"))
+            {
+                string str = "";
+                foreach (string e in headerList)
+                {
+                    str += String.Format("\"{0}\",", e);
+                }
+                sw.WriteLine("[" + str.Remove(str.Length-1) + "]");
+            }
+
+            using (StreamWriter sw = new StreamWriter("test2.txt"))
+            {
+                string str = "";
+                foreach (string e in greatestHeaderWordList)
+                {
+                   str += String.Format("\"{0}\",",e);
+                   
+                }
+                sw.WriteLine("[" + str.Remove(str.Length - 1) + "]");
             }
         }
 
@@ -140,9 +166,35 @@ namespace ConvertorClass
 
                 }
             }
+
+            using (StreamWriter sw = new StreamWriter("2test1.txt"))
+            {
+                string str = "";
+                foreach (string e in headerList)
+                {
+                    str += String.Format("\"{0}\",", e);
+                }
+                sw.WriteLine("[" + str.Remove(str.Length - 1) + "]");
+            }
+
+            using (StreamWriter sw = new StreamWriter("2test2.txt"))
+            {
+                string str = "";
+                foreach (string e in greatestHeaderWordList)
+                {
+                    str += String.Format("\"{0}\",", e);
+                }
+                sw.WriteLine("[" + str.Remove(str.Length - 1) + "]");
+            }
         }
 
-        public void ProcessFirstDataLine(string[] lineSplit, long lineIndex)
+        /// <summary>
+        /// Process data lines. Must search according to primary key to combine data rows.
+        /// </summary>
+        /// <remarks>
+        /// Returns string of data row or null if the line being processed has no primary key.
+        /// </remarks>
+        public string ProcessDataLine(string[] lineSplit, long lineIndex, int primaryKey, int dataFormat)
         {
             // Use lineCountList to know how much each cell is suppose to be in length
             //Split by two spaces
@@ -150,6 +202,7 @@ namespace ConvertorClass
             int totalCharCount = 0;
             int iMax = -1;
             int i = 0;
+            string return_data = "";
 
             foreach (string s in lineSplit)
             {
@@ -164,14 +217,14 @@ namespace ConvertorClass
                     while (i < lineCountList.Count && totalCharCount > (int)lineCountList[i])
                     {
                         if (i > iMax)
-                            dataList.Add("");
+                            tempDataList.Add("");
                         i++;
 
                     }
 
                     if (i > iMax)
                         iMax = i;
-                    dataList.Add(s.Trim().Replace(',', ' ').Replace('"', ' '));
+                    tempDataList.Add(s.Trim().Replace(',', ' ').Replace('"', ' '));
 
                     totalCharCount += 2;
                 }
@@ -181,72 +234,62 @@ namespace ConvertorClass
             //leftovers
             while (i < lineCountList.Count - 1)
             {
-                dataList.Add("");
+                tempDataList.Add("");
                 i++;
             }
 
-            if (dataList.Count != headerList.Count)
+            if (tempDataList.Count != headerList.Count)
             {
                 if (!skip)
                 {
                     Console.WriteLine(String.Format("ERROR: Line {0} Misaligned Column. See \\helpfiles to manually fix.", lineIndex));
-                    while (dataList.Count < headerList.Count)
+                    while (tempDataList.Count < headerList.Count)
                     {
-                        dataList.Add("");
+                        tempDataList.Add("");
                     }
-                    while (dataList.Count > headerList.Count)
+                    while (tempDataList.Count > headerList.Count)
                     {
-                        dataList.RemoveAt(dataList.Count - 1);
+                        tempDataList.RemoveAt(tempDataList.Count - 1);
                     }
 
                 }
                 else
                     Console.WriteLine(String.Format("Skipping Line {0} Misaligned Column.", lineIndex));
             }
+
+            if (checkPrimaryKey(tempDataList, primaryKey, dataFormat))
+            {
+                if (dataList.Count > 0)
+                {
+                    return_data = createDataLine();
+                    dataList.Clear();
+                }
+                dataList = deepCopy(tempDataList);
+                tempDataList.Clear();
+            }
+            else
+            {
+                AppendDataLines();
+                tempDataList.Clear(); 
+            }
+
+            return return_data;
         }
 
         /// <summary>
         /// Process data lines following the first data line
         /// </summary>
         /// <remarks>
-        /// Accepts string[] that has been split from an aligned text file.
+        /// Takes tempData and Datalist and merges them.
         /// </remarks>
-        public void ProcessOtherDataLines(string[] lineSplit)
+        public void AppendDataLines()
         {
-            // Use lineCountList to know how much each cell is suppose to be in length
-            //Split by two spaces
-            // Multi only
-            int totalCharCount = 0;
-
-            foreach (string s in lineSplit)
+            for (int i = 0; i < dataList.Count; i++)
             {
-                if (s.Trim() == "")
+                if (tempDataList[i] != "")
                 {
-                    totalCharCount += 2;
-                }
-                else
-                {
-
-                    totalCharCount += s.Length;
-                    int i = 0;
-                    while (totalCharCount > (int)lineCountList[i])
-                    {
-                        i++;
-                    }
-
-                    //possible bug - should never get to here
-                    if (i >= lineCountList.Count)
-                    {
-                        Console.WriteLine("Bug has occurred. Please check textFile.input files. Continuing process..");
-                        Console.ReadLine();
-                        i = lineCountList.Count - 1;
-                    }
-
-
                     dataList[i] = string.Format("{0} {1}",
-                    (string)dataList[i], s.Trim().Replace(',', ' ').Replace('"', ' '));
-
-                    totalCharCount += 2;
+                        dataList[i], tempDataList[i]);
                 }
             }
         }
@@ -288,6 +331,16 @@ namespace ConvertorClass
                     headerList[s] = String.Format("\"{0}\"", str);
                 }
             }
+
+            using (StreamWriter sw = new StreamWriter("5test1.txt"))
+            {
+                string str = "";
+                foreach (string e in headerList)
+                {
+                    str += String.Format("\"{0}\",", e);
+                }
+                sw.WriteLine("[" + str.Remove(str.Length - 1) + "]");
+            }
         }
 
         /// <summary>
@@ -300,7 +353,7 @@ namespace ConvertorClass
         /// *This could be unexpected behavior however.
         /// </remarks>
         public void PadDataList()
-        { 
+        {
             while (dataList.Count < headerList.Count)
             {
                 dataList.Add("");
@@ -317,11 +370,51 @@ namespace ConvertorClass
 
             if (dataList.Count != headerList.Count)
                 throw new Exception("Data error: Datalist != HeaderList count");
+
         }
 
+        /// <summary>
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
         public void ClearDataList()
         {
             dataList = new List<String>();
         }
+
+        public void ClearTempList()
+        {
+            tempDataList = new List<String>();
+        }
+
+        private bool checkPrimaryKey(List<string> list, int primaryKey, int dataFormat)
+        {
+            //Make sure ONELINE is set or that MULTILINE primary key record is not NULL
+            //dataList[csvFile.primaryKey] == NULL : Not a new row of data, instead it follows from the previous.
+            //dataList[csvFile.primaryKey] != NULL : A new row of data
+            return dataFormat == ONELINE ||
+                (dataFormat == MULTILINE && list[primaryKey] != "");
+
+        }
+
+        public string createDataLine()
+        {
+            PadDataList();
+            return string.Join(",", dataList.ToArray());
+        }
+
+        private List<String> deepCopy(List<String> a)
+        {
+            if (a == null)
+                return null;
+
+            List<String> b = new List<String>();
+            foreach (string element in a){
+                b.Add(element);
+            }
+
+            return b;
+        }
+
     }
 }
