@@ -1,0 +1,16 @@
+
+
+
+Acquirer's        Acquiror    Acquiror           SIC      Acquiror SIC Codes            
+Indemnification    CUSIP      Accts Payable    Acquiror                                    
+Cap (USD)                      LTM              Codes                                   
+                              (host mil)                                                
+                  87192H                       7376       7376/7372/7379/7374           
+                                               7372                                     
+                                               7379
+                                               7374
+                  72022A                       6799       6799                          
+                  67135K                       5182       5182/5181/5921                
+                                               5181
+                                               5921
+                  08588T                       2834       2834/2833/2836                
