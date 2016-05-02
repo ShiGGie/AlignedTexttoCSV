@@ -154,10 +154,10 @@ namespace CSVConverterConsole
                 Console.WriteLine("Unknown Error: Files does not exist. Skipping.");
         }
 
-        private static void ProcessFile(string input, string output, int numHeaderLines, int dataFormat, int primaryKey, string[] delim, bool skip)
+        private static void ProcessFile(string inputpath, string outputpath, int numHeaderLines, int dataFormat, int primaryKey, string[] delim, bool skip)
         {
-            TextFileMetadata textFile = new TextFileMetadata(input);
-            CSVFileMetadata csvFile = new CSVFileMetadata(output, numHeaderLines, dataFormat, primaryKey, delim);
+            TextFileMetadata textFile = new TextFileMetadata(inputpath);
+            CSVFileMetadata csvFile = new CSVFileMetadata(outputpath, numHeaderLines, dataFormat, primaryKey, delim);
             Convertor convertor = new Convertor(textFile, csvFile, skip);
             convertor.Run();
         }

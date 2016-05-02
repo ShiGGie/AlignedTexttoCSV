@@ -13,148 +13,115 @@ using System.Collections;
 
 namespace TestClass
 {
-    class UnitTestClass
+    public class UnitTestClass
     {
-
+        
         /// <summary>
-        /// TestFixture defines a class of tests
+        /// Defines a set of Tests for AWTTP.
+        ///     The Stub raw text begins with data and ends with data. (No empty lines before data)
         /// </summary>
         [TestFixture(), Category("Unit"), Description("Tests AlignedWordsToTableProcessor")]
-        public class Test
+        public class AWTTPUnitTests
         {
-            public static TextFileMetadata testTextFile;
-            public static CSVFileMetadata testCsvFile;
-            public static AlignedWordsToTableProcessor testAWTTP;
-            public static ModelData testModelData;
+            public static StubTableData STD = new StubTableData();
+            public static AlignedWordsToTableProcessor AWTTP = new AlignedWordsToTableProcessor(true);
+            public static string[] textFile = STD.rawText.Split(new Char[] { '\n' });
+            private const int PRIMARYKEY = 1;
+            private const int HEADERLINES = 4;
+            private const int MULTILINE = 0;
+            private const string DELIMITER = "  "; // *TWO* spaces.
 
-            [Test]
-            public void init()
+            //[TestFixtureSetUp]
+            //public void FixtureSetUp()
+            //{
+            //    STD = new StubTableData();
+            //    AWTTP = new AlignedWordsToTableProcessor(true);
+            //    textFile = STD.rawText.Split(new Char[] { '\n' });
+            //}
+
+            [Test, Category("Header")]
+            public void ProcessHeaderLine1()
             {
-                //output path
-                testAWTTP = new AlignedWordsToTableProcessor(true);
-                testModelData = new ModelData();
+                AWTTP.ProcessFirstHeaderLine(textFile[0].Split(new string[] { "  " }, StringSplitOptions.None));
+                Assert.AreEqual(STD.headerLine_1, AWTTP.headerList);
+                Assert.AreEqual(STD.lineCount_1, AWTTP.lineCountList);
+                Assert.AreEqual(STD.greatestHeaderList_1, AWTTP.greatestHeaderWordList);
             }
 
             [Test, Category("Header")]
-            public void ProcessFirstHeaderLine()
+            public void ProcessHeaderLine2()
             {
-                string[] lineSplit = 
-                    ProcessFirstHeaderLine(lineSplit);
-                stub.headerList = headerList;
-                stub.greatestHeaderWordList =
-                stub.lineCountList = 
+                AWTTP.ProcessHeaderLines(textFile[1].Split(new string[] { "  " }, StringSplitOptions.None));
+                Assert.AreEqual(STD.headerLine_2, AWTTP.headerList);
+                //Assert.AreEqual(STD.lineCount_2, AWTTP.lineCountList);
+               // Assert.AreEqual(STD.greatestHeaderList_2, AWTTP.greatestHeaderWordList);
             }
 
             [Test, Category("Header")]
-            public void ProcessHeaderLines2()
+            public void ProcessHeaderLine3()
             {
-                string[] lineSplit = 
-                ProcessHeaderLines(lineSplit);
-                stub.headerList = headerList;
-                stub.greatestHeaderWordList =
-                stub.lineCountList = 
+                AWTTP.ProcessHeaderLines(textFile[2].Split(new string[] { "  " }, StringSplitOptions.None));
+                Assert.AreEqual(STD.headerLine_3, AWTTP.headerList);
+               // Assert.AreEqual(STD.lineCount_3, AWTTP.lineCountList);
+              //  Assert.AreEqual(STD.greatestHeaderList_3, AWTTP.greatestHeaderWordList);
             }
+
 
             [Test, Category("Header")]
-            public void headerList()
+            public void ProcessHeaderLine4()
             {
-                Assert.IsNotEmpty(testAWTTP.headerList);
-                CollectionAssert.AreEqual(testAWTTP.headerList, testModelData.headerList);
-            }
-
-
-            [Test, Category("WordLengths")]
-            public void greatestHeaderWordList()
-            {
-                Assert.IsNotEmpty(testAWTTP.greatestHeaderWordList);
-                CollectionAssert.AreEqual(testAWTTP.greatestHeaderWordList, testModelData.greatestHeaderWordList);
+                AWTTP.ProcessHeaderLines(textFile[3].Split(new string[] { "  " }, StringSplitOptions.None));
+                Assert.AreEqual(STD.headerLine_4, AWTTP.headerList);
+               // Assert.AreEqual(STD.lineCount_4, AWTTP.lineCountList);
+               // Assert.AreEqual(STD.greatestHeaderList_4, AWTTP.greatestHeaderWordList);
             }
 
             [Test, Category("Data")]
-            public void ProcessFirstDataLine()
+            public void ProcessDataLine5()
             {
-                ProcessFirstDataLine(string[] lineSplit, long lineIndex);
-                dataList = ;
+                AWTTP.ProcessDataLine(textFile[4].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
+                Assert.AreEqual(STD.dataline_5, AWTTP.dataList );
             }
 
             [Test, Category("Data")]
-            public void ProcessOtherDataLines(string[] lineSplit)
+            public void ProcessDataLine6789101112()
             {
-                ProcessFirstDataLine(string[] lineSplit, long lineIndex);
-                dataList = ;
+                AWTTP.ProcessDataLine(textFile[5].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
+                Assert.AreEqual(STD.dataline_6, AWTTP.dataList );
+                AWTTP.ProcessDataLine(textFile[6].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
+                Assert.AreEqual(STD.dataline_7, AWTTP.dataList);
+                AWTTP.ProcessDataLine(textFile[7].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
+                Assert.AreEqual(STD.dataline_8, AWTTP.dataList);
+                AWTTP.ProcessDataLine(textFile[8].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
+                Assert.AreEqual(STD.dataline_9, AWTTP.dataList);
+                AWTTP.ProcessDataLine(textFile[9].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
+                Assert.AreEqual(STD.dataline_10, AWTTP.dataList);
+                AWTTP.ProcessDataLine(textFile[10].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
+                Assert.AreEqual(STD.dataline_11, AWTTP.dataList);
+                AWTTP.ProcessDataLine(textFile[11].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
+                Assert.AreEqual(STD.dataline_12, AWTTP.dataList);
             }
 
             [Test, Category("Data")]
-            public void CompleteDataCheck()
+            public void ProcessDataLine13()
             {
-                string[] lineSplit = 
-                    ProcessHeaderLines(lineSplit);
-                stub.headerList = headerList;
-                stub.greatestHeaderWordList =
-                stub.lineCountList = 
+                AWTTP.ProcessDataLine(textFile[12].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
+                Assert.AreEqual(STD.dataline_13, AWTTP.dataList );
             }
+
 
             [Test, Category("Helper")]
             public void CombineToSASHeaderLine()
             {
-                //For SAS format, must eliminate duplicates in header as well as
-                // truncate to 32 character.
-
-                var map = new Dictionary<string, int>();
-                for (int s = 0; s < headerList.Count; s++)
-                {
-
-                    string str = (string)headerList[s];
-                    string substring;
-
-                    if (str.Length > 29)
-                        substring = str.Substring(0, 30);
-                    else
-                        substring = str.Substring(0, str.Length);
-
-                    if (map.ContainsKey(substring))
-                    {
-                        map[substring]++;
-                        headerList[s] = String.Format("\"{1}{0}\"", str,
-                            map[substring]);
-
-                    }
-                    else
-                    {
-                        map.Add(substring, 1);
-                        headerList[s] = String.Format("\"{0}\"", str);
-                    }
-                }
+                Assert.True(true);
             }
 
 
             [Test, Category("Helper")]
             public void PadDataList()
             {
-                while (dataList.Count < headerList.Count)
-                {
-                    dataList.Add("");
-                }
-                while (dataList.Count > headerList.Count)
-                {
-                    dataList.RemoveAt(dataList.Count - 1);
-                }
-
-                for (int i = 0; i < dataList.Count; i++)
-                {
-                    dataList[i] = String.Format("\"{0}\"", dataList[i]);
-                }
-
-                if (dataList.Count != headerList.Count)
-                    throw new Exception("Data error: Datalist != HeaderList count");
+                Assert.True(true);
             }
-
-            [Test, Category("Helper")]
-            public void ClearDataList()
-            {
-                dataList = new List<String>();
-            }
-
 
             [TestFixtureTearDown]
             public void FixtureTearDown()

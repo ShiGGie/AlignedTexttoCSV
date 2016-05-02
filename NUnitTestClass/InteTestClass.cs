@@ -67,14 +67,12 @@ namespace TestClass
         public void fileHeader()
         {
             //String Asserts
-            Assert.Fail();
         }
 
         [Test, Category("Data")]
         public void fileData()
         {
             //String Asserts
-            Assert.Fail();
         }
 
 

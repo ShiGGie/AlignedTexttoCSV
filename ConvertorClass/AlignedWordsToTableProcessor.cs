@@ -11,6 +11,7 @@ namespace ConvertorClass
     {
         private const int ONELINE = 1;
         private const int MULTILINE = 0;
+        //private int debug = 0;
 
         private readonly bool skip;
         public List<String> headerList { get; private set; }
@@ -33,7 +34,14 @@ namespace ConvertorClass
             this.skip = skipErrors;
         }
 
-
+        /// <summary>
+        /// Process header lines following the first header line
+        /// </summary>
+        /// <remarks>
+        /// Fills lineCount (word lengths) List
+        /// Fills HeaderList (each of the header words)
+        /// Fills Greatest Word (using word length) List
+        /// </remarks>
         public void ProcessFirstHeaderLine(string[] lineSplit)
         {
 
@@ -41,7 +49,7 @@ namespace ConvertorClass
             int totalCharCount = 0;
 
             //1 Count number of nulls. aka two spaces with nothing in them
-            //2 Add non nulls to an List<String>
+            //2 Add non nulls to a List<String>
 
             int arrayIndex = 0;
             foreach (string s in lineSplit)
@@ -64,7 +72,6 @@ namespace ConvertorClass
                     else
                         lineCountList.Add(totalCharCount + totalNullCount);
 
-                    //Always a "csvFile.delimiter" missing from calculations when splitting.\. in between split thing.
                     totalNullCount = 2;
                     totalCharCount += 2;
 
@@ -81,12 +88,16 @@ namespace ConvertorClass
                 greatestHeaderWordList.Add(e);
             }
 
-           
+            //debug++;
+            //DebugToFile("headerLine_" + debug, headerList);
+            //DebugToFile("lineCount_" + debug, lineCountList);
+            //DebugToFile("greatestHeaderList_" + debug, greatestHeaderWordList);
         }
 
         /// <summary>
         /// Process header lines following the first header line
         /// </summary>
+        /// 
         /// <remarks>
         /// Accepts string[] that has been split from an aligned text file.
         /// </remarks>
@@ -121,7 +132,16 @@ namespace ConvertorClass
 
 
                     //Adjusting alignment
-                    //Check if left aligned
+                    //No need to re adjust for the first cell
+                    //This portion attempts to align data cells to the largest header word.
+                    // Example: 
+                            //          Acquiror
+                            //      Accts Payable
+                    //data:         xxxxx
+                    // It has no effect if words are left aligned. Example:
+                            //          Acquiror
+                            //          Accts Payable
+                    //Data:             xxxxx
 
                     if (i > 0)
                     {
@@ -133,7 +153,7 @@ namespace ConvertorClass
                             int difference = (str.Length - ((string)greatestHeaderWordList[i]).Length) + 1;
                             if (difference > 1)
                             {
-                                lineCountList[i - 1] = (int)lineCountList[i - 1] - (difference) / 2;
+                                lineCountList[i - 1] = (int)lineCountList[i - 1] - (difference) / 2; //subtract space from previous word to gain space
                                 //lineCountList[i] = (int)lineCountList[i] + difference/2; Because there's plenty                of space already.
                                 greatestHeaderWordList[i] = str;
                             }
@@ -148,7 +168,10 @@ namespace ConvertorClass
                 }
             }
 
-        
+            //debug++;
+            //DebugToFile("headerLine_"+debug, headerList);
+            //DebugToFile("lineCount_" + debug, lineCountList);
+            //DebugToFile("greatestHeaderList_" + debug, greatestHeaderWordList);
         }
 
         /// <summary>
@@ -236,8 +259,43 @@ namespace ConvertorClass
                 tempDataList.Clear(); 
             }
 
+            //debug++;
+            //DebugToFile("dataline_" + debug, dataList);
+
             return return_data;
         }
+
+        //private void DebugToFile(string filename, List<string> l)
+        //{
+        //    string filename2 = filename + ".txt";
+        //    using (StreamWriter sw = new StreamWriter(filename2))
+        //    {
+        //        sw.Write("public List<String> " + filename + " = new List<String>{");
+        //        for (int i = 0; i < l.Count; i++)
+        //        {
+        //            sw.Write("\""+l[i]+"\"");
+        //            if (i != l.Count - 1)
+        //                sw.Write(",");
+        //        }
+        //        sw.Write("};");
+        //    }
+        //}
+
+        //private void DebugToFile(string filename, List<int> l)
+        //{
+        //    string filename2 = filename + ".txt";
+        //    using (StreamWriter sw = new StreamWriter(filename2))
+        //    {
+        //        sw.Write("public List<int> " + filename + " = new List<int>{");
+        //        for (int i = 0; i < l.Count; i++)
+        //        {
+        //            sw.Write(l[i]);
+        //            if (i != l.Count - 1)
+        //                sw.Write(",");
+        //        }
+        //        sw.Write("};");
+        //    }
+        //}
 
         /// <summary>
         /// Process data lines following the first data line
@@ -247,7 +305,10 @@ namespace ConvertorClass
         /// </remarks>
         public void AppendDataLines()
         {
-            for (int i = 0; i < dataList.Count; i++)
+            if (tempDataList.Count > dataList.Count)
+                return;
+
+            for (int i = 0; i < tempDataList.Count; i++)
             {
                 if (tempDataList[i] != "")
                 {
@@ -257,6 +318,19 @@ namespace ConvertorClass
             }
         }
 
+        private List<String> deepCopy(List<String> a)
+        {
+            if (a == null)
+                return null;
+
+            List<String> b = new List<String>();
+            foreach (string element in a)
+            {
+                b.Add(element);
+            }
+
+            return b;
+        }
         /// <summary>
         /// Combines a multi-lined header.
         /// </summary>
@@ -307,7 +381,7 @@ namespace ConvertorClass
         /// 
         /// *This could be unexpected behavior however.
         /// </remarks>
-        public void PadDataList()
+        private void PadAndFormatDataList()
         {
             while (dataList.Count < headerList.Count)
             {
@@ -354,22 +428,10 @@ namespace ConvertorClass
 
         public string createDataLine()
         {
-            PadDataList();
+            PadAndFormatDataList();
             return string.Join(",", dataList.ToArray());
         }
 
-        private List<String> deepCopy(List<String> a)
-        {
-            if (a == null)
-                return null;
-
-            List<String> b = new List<String>();
-            foreach (string element in a){
-                b.Add(element);
-            }
-
-            return b;
-        }
 
     }
 }

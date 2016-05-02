@@ -58,7 +58,12 @@ namespace ConvertorClass
                                 newLine = AWTTP.ProcessDataLine(lineSplit, lineIndex, csvFile.primaryKey, csvFile.dataFormat);
 
                             if (lineIndex == csvFile.numHeaderLines - 1)
-                                WriteHeaderLine(AWTTP, writetext);
+                            {
+                                //write headerList
+                                AWTTP.CombineToSASHeaderLine();
+                                headerLine = string.Join(",", AWTTP.headerList.ToArray());
+                                WriteHeaderLine(headerLine, AWTTP, writetext);
+                            }
 
                             if (newLine != "")
                                 writeDataLine(newLine, AWTTP, writetext);
@@ -77,12 +82,8 @@ namespace ConvertorClass
             }//reader
         }
 
-        private void WriteHeaderLine(AlignedWordsToTableProcessor AWTTP, StreamWriter writetext)
+        private void WriteHeaderLine(string headerline, AlignedWordsToTableProcessor AWTTP, StreamWriter writetext)
         {
-            //write headerList
-            AWTTP.CombineToSASHeaderLine();
-
-            headerLine = string.Join(",", AWTTP.headerList.ToArray());
             writetext.WriteLine(headerLine);
 
 

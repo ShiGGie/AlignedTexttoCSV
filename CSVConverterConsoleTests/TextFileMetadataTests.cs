@@ -13,7 +13,7 @@ namespace CSVConverterConsole.Tests
         [TestMethod()]
         public void TextFileMetadataTest()
         {
-            Assert.Fail();
+
         }
     }
 }
