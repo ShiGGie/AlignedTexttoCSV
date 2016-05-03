@@ -9,7 +9,7 @@ using System.Collections;
 using ConvertorClass.Containers;
 using ConvertorClass;
 
-namespace TestClass
+namespace NUnitTestClass
 {
 
     /// <summary>
@@ -41,7 +41,7 @@ namespace TestClass
             int primaryKey = 107;
             string[] delim = new string[] { "  " };
 
-            shortTextFile = new TextFileMetadata("..\\..\\..\\datasamples\\size7header-multiline\\primarykey107\\short-MA_var2y00to01.txt");
+            shortTextFile = new TextFileMetadata("Z:\\C\\Git\\my\\TexttoCSV\\datasamples\\size7header-multiline\\primarykey107\\short-MA_var2y00to01.txt");
             shortCsvFile = new CSVFileMetadata(output, numHeaderLines, dataFormat, primaryKey, delim);
             shortConvertor = new Convertor(shortTextFile, shortCsvFile, true);
             shortModelData = new ModelData();
@@ -66,13 +66,11 @@ namespace TestClass
         [Test, Category("Data")]
         public void fileHeader()
         {
-            //String Asserts
         }
 
         [Test, Category("Data")]
         public void fileData()
         {
-            //String Asserts
         }
 
 

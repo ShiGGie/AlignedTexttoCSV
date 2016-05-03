@@ -8,10 +8,9 @@ using System.IO;
 using System.Collections;
 using ConvertorClass.Containers;
 using ConvertorClass;
-using System.Collections;
 
-
-namespace TestClass
+//Requires NUnit 3. Recommended with NUnit3 Test Adapter.
+namespace NUnitTestClass
 {
     public class UnitTestClass
     {
@@ -20,6 +19,7 @@ namespace TestClass
         /// Defines a set of Tests for AWTTP.
         ///     The Stub raw text begins with data and ends with data. (No empty lines before data)
         /// </summary>
+
         [TestFixture(), Category("Unit"), Description("Tests AlignedWordsToTableProcessor")]
         public class AWTTPUnitTests
         {
@@ -39,7 +39,8 @@ namespace TestClass
             //    textFile = STD.rawText.Split(new Char[] { '\n' });
             //}
 
-            [Test, Category("Header")]
+
+            [Test, Category("Header"), Order(1)]
             public void ProcessHeaderLine1()
             {
                 AWTTP.ProcessFirstHeaderLine(textFile[0].Split(new string[] { "  " }, StringSplitOptions.None));
@@ -48,42 +49,44 @@ namespace TestClass
                 Assert.AreEqual(STD.greatestHeaderList_1, AWTTP.greatestHeaderWordList);
             }
 
-            [Test, Category("Header")]
+            [Test, Category("Header"), Order(2)]
             public void ProcessHeaderLine2()
             {
                 AWTTP.ProcessHeaderLines(textFile[1].Split(new string[] { "  " }, StringSplitOptions.None));
                 Assert.AreEqual(STD.headerLine_2, AWTTP.headerList);
-                //Assert.AreEqual(STD.lineCount_2, AWTTP.lineCountList);
-               // Assert.AreEqual(STD.greatestHeaderList_2, AWTTP.greatestHeaderWordList);
+                //TODO: Fix feature that helps reduce alignment error.
+                Assert.AreEqual(STD.lineCount_2, AWTTP.lineCountList);
+                Assert.AreEqual(STD.greatestHeaderList_2, AWTTP.greatestHeaderWordList);
             }
 
-            [Test, Category("Header")]
+            [Test, Category("Header"), Order(3)]
             public void ProcessHeaderLine3()
             {
                 AWTTP.ProcessHeaderLines(textFile[2].Split(new string[] { "  " }, StringSplitOptions.None));
                 Assert.AreEqual(STD.headerLine_3, AWTTP.headerList);
-               // Assert.AreEqual(STD.lineCount_3, AWTTP.lineCountList);
-              //  Assert.AreEqual(STD.greatestHeaderList_3, AWTTP.greatestHeaderWordList);
+                //TODO: Fix feature that helps reduce alignment error.
+                //Assert.AreEqual(STD.lineCount_3, AWTTP.lineCountList);
+                //Assert.AreEqual(STD.greatestHeaderList_3, AWTTP.greatestHeaderWordList);
             }
 
 
-            [Test, Category("Header")]
+            [Test, Category("Header"), Order(4)]
             public void ProcessHeaderLine4()
             {
                 AWTTP.ProcessHeaderLines(textFile[3].Split(new string[] { "  " }, StringSplitOptions.None));
                 Assert.AreEqual(STD.headerLine_4, AWTTP.headerList);
-               // Assert.AreEqual(STD.lineCount_4, AWTTP.lineCountList);
-               // Assert.AreEqual(STD.greatestHeaderList_4, AWTTP.greatestHeaderWordList);
+                //Assert.AreEqual(STD.lineCount_4, AWTTP.lineCountList);
+                //Assert.AreEqual(STD.greatestHeaderList_4, AWTTP.greatestHeaderWordList);
             }
 
-            [Test, Category("Data")]
+            [Test, Category("Data"), Order(5)]
             public void ProcessDataLine5()
             {
                 AWTTP.ProcessDataLine(textFile[4].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
                 Assert.AreEqual(STD.dataline_5, AWTTP.dataList );
             }
 
-            [Test, Category("Data")]
+            [Test, Category("Data"), Order(6)]
             public void ProcessDataLine6789101112()
             {
                 AWTTP.ProcessDataLine(textFile[5].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
@@ -102,7 +105,7 @@ namespace TestClass
                 Assert.AreEqual(STD.dataline_12, AWTTP.dataList);
             }
 
-            [Test, Category("Data")]
+            [Test, Category("Data"), Order(7)]
             public void ProcessDataLine13()
             {
                 AWTTP.ProcessDataLine(textFile[12].Split(new string[] { "  " }, StringSplitOptions.None), 0, PRIMARYKEY, MULTILINE);
